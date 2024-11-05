@@ -21,26 +21,7 @@ function update.updateGame(dt, player, npcs, cam, possessedNpc, gamePaused)
     cam:lookAt(controlledCharacter.x, controlledCharacter.y)
 
     -- NPC wandering logic
-    for _, npc in ipairs(npcs) do
-        if npc ~= possessedNpc then
-            npc.moveTimer = npc.moveTimer + dt
-            if npc.moveTimer >= npc.moveInterval then
-                npc.moveTimer = 0
-                local directions = { "up", "down", "left", "right" }
-                npc.direction = directions[math.random(#directions)]
-            end
-
-            if npc.direction == "up" then
-                npc.y = npc.y - npc.speed * dt
-            elseif npc.direction == "down" then
-                npc.y = npc.y + npc.speed * dt
-            elseif npc.direction == "left" then
-                npc.x = npc.x - npc.speed * dt
-            elseif npc.direction == "right" then
-                npc.x = npc.x + npc.speed * dt
-            end
-        end
-    end
+    npcs:update(dt)
 end
 
 return update
