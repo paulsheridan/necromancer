@@ -1,20 +1,17 @@
 require('src/npc')
 require('src/utilities')
-local vector = require("libraries/hump/vector")
 local player = require('src/player')
 local update = require('src/update')
 local camera = require('libraries/hump/camera')
 
--- Init Camera
 local cam = camera(0, 0)
 cam.smoother = camera.smooth.damped(8)
 
--- Game state
 local gamePaused = false
 local markedNpcs = {}
-local possessedNpc = nil -- Track which NPC is possessed
+local possessedNpc = nil
 local menuOpen = false
-local selectedMenuIndex = 1 -- Tracks the selected NPC in the menu
+local selectedMenuIndex = 1
 local numNpcs = 6
 local bush = {
     x = 200,
@@ -23,31 +20,29 @@ local bush = {
     height = 32
 }
 
--- Load function
 function love.load()
-    love.graphics.setBackgroundColor(0.2, 0.7, 0.3) -- Green background
+    sti = require 'libraries/sti'
+    gameMap = sti('maps/sampleMap.lua')
+
     for i = 1, numNpcs do
         local npc = spawnNpc(math.random(50, 400), math.random(50, 400))
         table.insert(npcs, npc)
     end
 end
 
--- Update function
 function love.update(dt)
     if not gamePaused then
-        -- Update the game state by calling the function from update.lua
         update.updateGame(dt, player, npcs, cam, possessedNpc, gamePaused)
     end
 end
 
--- Draw function
 function love.draw()
+    gameMap:draw()
     cam:attach()
-    -- Draw player and world objects
     love.graphics.setColor(1, 0, 0)
     love.graphics.rectangle("fill", player.x, player.y, player.width, player.height)
 
-    love.graphics.setColor(0.3, 0.5, 0.2)     -- Green color for bush
+    love.graphics.setColor(0.3, 0.5, 0.2)
     love.graphics.rectangle("fill", bush.x, bush.y, bush.width, bush.height)
 
     for _, npc in ipairs(npcs) do
@@ -59,11 +54,9 @@ function love.draw()
         love.graphics.rectangle("fill", npc.x, npc.y, npc.width, npc.height)
     end
 
-    love.graphics.setColor(1, 1, 1) -- Reset color for other elements
-    -- Additional drawing for other elements like bushes, player, etc.
+    love.graphics.setColor(1, 1, 1)
     cam:detach()
 
-    -- Draw pause menu if game is paused
     if gamePaused then
         love.graphics.setColor(0, 0, 0, 0.5)
         love.graphics.rectangle("fill", 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
@@ -71,7 +64,6 @@ function love.draw()
         love.graphics.printf("Game Paused", 0, love.graphics.getHeight() / 2 - 10, love.graphics.getWidth(), "center")
     end
 
-    -- Draw marked NPC selection menu
     if menuOpen then
         love.graphics.setColor(0, 0, 0, 0.7)
         love.graphics.rectangle("fill", 100, 100, 200, 200)
@@ -89,25 +81,23 @@ function love.draw()
     end
 end
 
--- Key press handler
 function love.keypressed(key)
     if key == "p" then
         gamePaused = not gamePaused
     elseif key == "f" then
         markedNpc = player:markNearbyNpc()
     elseif key == "m" then
-        menuOpen = not menuOpen -- Toggle the menu
-        selectedMenuIndex = 1   -- Reset selection when menu is opened
+        menuOpen = not menuOpen
+        selectedMenuIndex = 1
     elseif key == "e" and menuOpen then
-        -- Possess the selected NPC in the menu
         possessedNpc = markedNpcs[selectedMenuIndex]
-        menuOpen = false                                                       -- Close the menu
+        menuOpen = false
     elseif key == "up" and menuOpen then
-        selectedMenuIndex = math.max(1, selectedMenuIndex - 1)                 -- Move up
+        selectedMenuIndex = math.max(1, selectedMenuIndex - 1)
     elseif key == "down" and menuOpen then
-        selectedMenuIndex = math.min(#markedNpcs, selectedMenuIndex + 1) -- Move down
+        selectedMenuIndex = math.min(#markedNpcs, selectedMenuIndex + 1)
     elseif key == "e" and possessedNpc then
-        possessedNpc = nil                                                     -- Release control back to the player
+        possessedNpc = nil
     end
 end
 
