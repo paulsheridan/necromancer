@@ -21,7 +21,7 @@ function update.updateGame(dt, player, npcs, cam, possessedNpc, gamePaused)
     cam:lookAt(controlledCharacter.x, controlledCharacter.y)
 
     -- NPC wandering logic
-    npcs:update(dt)
+    npcs:update(dt, possessedNpc)
 end
 
 return update

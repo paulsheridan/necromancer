@@ -7,7 +7,7 @@ player.width = 16
 player.height = 16
 
 -- Mark a nearby NPC if player is close
-function player:markNearbyNpc(npcs)
+function player:markNearbyNpc()
     for _, npc in ipairs(npcs) do
         if isNear(self, npc, 20) and not npc.marked then
             npc:mark()

@@ -12,7 +12,6 @@ function spawnNpc(x, y)
     npc.moveInterval = 2
     npc.color = { 0, 0, 1 }
     npc.marked = false
-    npc.possessed = false
     -- NPC states:
     -- 0: idle, standing
     -- 1: wander, stopped
@@ -26,8 +25,8 @@ function spawnNpc(x, y)
         return self.marked
     end
 
-    function npc:update(dt)
-        if not self.possessed then
+    function npc:update(dt, possessedNpc)
+        if self ~= possessedNpc then
             self.moveTimer = self.moveTimer + dt
             if self.moveTimer >= self.moveInterval then
                 self.moveTimer = 0
@@ -50,8 +49,8 @@ function spawnNpc(x, y)
     return npc
 end
 
-function npcs:update(dt)
+function npcs:update(dt, possessedNpc)
     for _, npc in ipairs(self) do
-        npc:update(dt)
+        npc:update(dt, possessedNpc)
     end
 end

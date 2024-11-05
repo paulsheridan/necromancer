@@ -1,15 +1,13 @@
--- Load necessary libraries
-Camera = require 'libraries/hump/camera'
-Vector = require "libraries/hump/vector"
-
-local Camera = require 'libraries/hump/camera'
-local player = require 'src/player'
-local update = require 'src/update'
 require('src/npc')
+require('src/utilities')
+local vector = require("libraries/hump/vector")
+local player = require('src/player')
+local update = require('src/update')
+local camera = require('libraries/hump/camera')
 
 -- Init Camera
-local cam = Camera(0, 0)
-cam.smoother = Camera.smooth.damped(8)
+local cam = camera(0, 0)
+cam.smoother = camera.smooth.damped(8)
 
 -- Game state
 local gamePaused = false
@@ -96,7 +94,7 @@ function love.keypressed(key)
     if key == "p" then
         gamePaused = not gamePaused
     elseif key == "f" then
-        markedNpc = player.markNearbyNpc(npcs)
+        markedNpc = player:markNearbyNpc()
     elseif key == "m" then
         menuOpen = not menuOpen -- Toggle the menu
         selectedMenuIndex = 1   -- Reset selection when menu is opened
