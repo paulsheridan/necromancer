@@ -4,8 +4,8 @@ function spawnNpc(x, y)
     local npc = {}
     npc.x = x
     npc.y = y
-    npc.speed = 50
-    npc.width = 16
+    npc.speed = 30
+    npc.width = 10
     npc.height = 16
     npc.direction = "down"
     npc.moveTimer = 0

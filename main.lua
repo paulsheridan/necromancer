@@ -1,28 +1,26 @@
-require('src/npc')
-require('src/utilities')
-local player = require('src/player')
-local update = require('src/update')
-local camera = require('libraries/hump/camera')
-
-local cam = camera(0, 0)
-cam.smoother = camera.smooth.damped(8)
-
-local gamePaused = false
-local markedNpcs = {}
-local possessedNpc = nil
-local menuOpen = false
-local selectedMenuIndex = 1
-local numNpcs = 6
-local bush = {
-    x = 200,
-    y = 200,
-    width = 32,
-    height = 32
-}
-
 function love.load()
+    camera = require('libraries/hump/camera')
+    cam = camera()
+    cam.smoother = camera.smooth.damped(8)
+
+    love.graphics.setDefaultFilter("nearest", "nearest")
+
     sti = require 'libraries/sti'
     gameMap = sti('maps/sampleMap.lua')
+
+    player = require('src/player')
+    update = require('src/update')
+    utils = require('src/utilities')
+    npcUtils = require('src/npc')
+
+    gamePaused = false
+    markedNpcs = {}
+    possessedNpc = nil
+    menuOpen = false
+    selectedMenuIndex = 1
+    numNpcs = 6
+    scale = 1
+
 
     for i = 1, numNpcs do
         local npc = spawnNpc(math.random(50, 400), math.random(50, 400))
@@ -37,24 +35,23 @@ function love.update(dt)
 end
 
 function love.draw()
-    gameMap:draw()
+    love.graphics.scale(1 * scale, 1 * scale)
     cam:attach()
-    love.graphics.setColor(1, 0, 0)
-    love.graphics.rectangle("fill", player.x, player.y, player.width, player.height)
+        gameMap:drawLayer(gameMap.layers["GroundLayer"])
+        gameMap:drawLayer(gameMap.layers["GroundCover"])
+        love.graphics.setColor(1, 0, 0)
+        love.graphics.rectangle("fill", player.x, player.y, player.width, player.height)
 
-    love.graphics.setColor(0.3, 0.5, 0.2)
-    love.graphics.rectangle("fill", bush.x, bush.y, bush.width, bush.height)
-
-    for _, npc in ipairs(npcs) do
-        if npc.marked then
-            love.graphics.setColor(1, 1, 0) -- Yellow for marked NPCs
-        else
-            love.graphics.setColor(0, 0, 1) -- Blue for unmarked NPCs
+        for _, npc in ipairs(npcs) do
+            if npc.marked then
+                love.graphics.setColor(1, 1, 0) -- Yellow for marked NPCs
+            else
+                love.graphics.setColor(0, 0, 1) -- Blue for unmarked NPCs
+            end
+            love.graphics.rectangle("fill", npc.x, npc.y, npc.width, npc.height)
         end
-        love.graphics.rectangle("fill", npc.x, npc.y, npc.width, npc.height)
-    end
 
-    love.graphics.setColor(1, 1, 1)
+        love.graphics.setColor(1, 1, 1)
     cam:detach()
 
     if gamePaused then
@@ -98,6 +95,8 @@ function love.keypressed(key)
         selectedMenuIndex = math.min(#markedNpcs, selectedMenuIndex + 1)
     elseif key == "e" and possessedNpc then
         possessedNpc = nil
+    elseif key == "o" then
+        scale = scale + 1
     end
 end
 
