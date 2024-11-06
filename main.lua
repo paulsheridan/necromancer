@@ -6,7 +6,7 @@ function love.load()
     love.graphics.setDefaultFilter("nearest", "nearest")
 
     sti = require 'libraries/sti'
-    gameMap = sti('maps/sampleMap.lua')
+    gameMap = sti('maps/zeldaLikeOverworld.lua')
 
     player = require('src/player')
     update = require('src/update')
