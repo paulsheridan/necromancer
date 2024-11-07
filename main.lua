@@ -3,6 +3,8 @@ function love.load()
     cam = camera()
     cam.smoother = camera.smooth.damped(8)
 
+    anim8 = require('libraries/anim8')
+
     love.graphics.setDefaultFilter("nearest", "nearest")
 
     sti = require 'libraries/sti'
@@ -39,8 +41,9 @@ function love.draw()
     cam:attach()
         gameMap:drawLayer(gameMap.layers["GroundLayer"])
         gameMap:drawLayer(gameMap.layers["GroundCover"])
-        love.graphics.setColor(1, 0, 0)
-        love.graphics.rectangle("fill", player.x, player.y, player.width, player.height)
+        -- love.graphics.setColor(1, 0, 0)
+        -- love.graphics.rectangle("fill", player.x, player.y, player.width, player.height)
+        player.animations.down:draw(player.spriteSheet, player.x, player.y)
 
         for _, npc in ipairs(npcs) do
             if npc.marked then
