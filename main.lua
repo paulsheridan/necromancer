@@ -1,10 +1,9 @@
 function love.load()
     camera = require('libraries/hump/camera')
-    cam = camera()
+    cam = camera(_, _, scale)
     cam.smoother = camera.smooth.damped(8)
 
     anim8 = require('libraries/anim8')
-
     love.graphics.setDefaultFilter("nearest", "nearest")
 
     sti = require 'libraries/sti'
@@ -37,7 +36,7 @@ function love.update(dt)
 end
 
 function love.draw()
-    love.graphics.scale(1 * scale, 1 * scale)
+    -- love.graphics.scale(scale)
     cam:attach()
         gameMap:drawLayer(gameMap.layers["GroundLayer"])
         gameMap:drawLayer(gameMap.layers["GroundCover"])
