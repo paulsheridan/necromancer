@@ -25,7 +25,7 @@ function spawnNpc(x, y)
         return self.marked
     end
 
-    function npc:update(dt, possessedNpc)
+    function npc:update(dt)
         if self ~= possessedNpc then
             self.moveTimer = self.moveTimer + dt
             if self.moveTimer >= self.moveInterval then
@@ -49,8 +49,8 @@ function spawnNpc(x, y)
     return npc
 end
 
-function npcs:update(dt, possessedNpc)
+function npcs:update(dt)
     for _, npc in ipairs(self) do
-        npc:update(dt, possessedNpc)
+        npc:update(dt)
     end
 end

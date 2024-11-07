@@ -32,7 +32,7 @@ end
 
 function love.update(dt)
     if not gamePaused then
-        update.updateGame(dt, player, npcs, cam, possessedNpc, gamePaused)
+        update.updateGame(dt)
     end
 end
 
@@ -41,9 +41,7 @@ function love.draw()
     cam:attach()
         gameMap:drawLayer(gameMap.layers["GroundLayer"])
         gameMap:drawLayer(gameMap.layers["GroundCover"])
-        -- love.graphics.setColor(1, 0, 0)
-        -- love.graphics.rectangle("fill", player.x, player.y, player.width, player.height)
-        player.animations.down:draw(player.spriteSheet, player.x, player.y)
+        player.anim:draw(player.spriteSheet, player.x, player.y - 2, nil, player.dirX, 1, 9.5, 10.5)
 
         for _, npc in ipairs(npcs) do
             if npc.marked then
