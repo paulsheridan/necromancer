@@ -1,7 +1,8 @@
 function love.load()
-    camera = require('libraries/hump/camera')
-    cam = camera(_, _, scale)
-    cam.smoother = camera.smooth.damped(8)
+    wf = require('libraries/windfield')
+    world = wf.newWorld(0,0)
+
+    vector = require("libraries/hump/vector")
 
     anim8 = require('libraries/anim8')
     love.graphics.setDefaultFilter("nearest", "nearest")
@@ -9,10 +10,13 @@ function love.load()
     sti = require 'libraries/sti'
     gameMap = sti('maps/zeldaLikeOverworld.lua')
 
+
     player = require('src/player')
     update = require('src/update')
     utils = require('src/utilities')
     npcUtils = require('src/npc')
+    character = require('src/character')
+    require('src/cam')
 
     gamePaused = false
     markedNpcs = {}
@@ -27,6 +31,8 @@ function love.load()
         local npc = spawnNpc(math.random(50, 400), math.random(50, 400))
         table.insert(npcs, npc)
     end
+
+    setWindowSize(fullscreen, 1920, 1080)
 end
 
 function love.update(dt)
@@ -48,11 +54,11 @@ function love.draw()
             else
                 love.graphics.setColor(0, 0, 1) -- Blue for unmarked NPCs
             end
-            love.graphics.rectangle("fill", npc.x, npc.y, npc.width, npc.height)
+            npc.anim:draw(npc.spriteSheet, npc.x, npc.y - 2, nil, npc.dirX, 1, 9.5, 10.5)
         end
 
         love.graphics.setColor(1, 1, 1)
-    cam:detach()
+        world:draw()
 
     if gamePaused then
         love.graphics.setColor(0, 0, 0, 0.5)
@@ -76,6 +82,7 @@ function love.draw()
             love.graphics.printf("NPC " .. i, 110, 120 + i * 20, 180, "center")
         end
     end
+    cam:detach()
 end
 
 function love.keypressed(key)
@@ -102,4 +109,28 @@ end
 
 function insertMarkedNpc(npc)
     table.insert(markedNpcs, npc)
+end
+
+function setWindowSize(full, width, height)
+    if full then
+        fullscreen = true
+        love.window.setFullscreen(true)
+        windowWidth = love.graphics.getWidth()
+        windowHeight = love.graphics.getHeight()
+    else
+        fullscreen = false
+        if width == nil or height == nil then
+            windowWidth = 1920
+            windowHeight = 1080
+        else
+            windowWidth = width
+            windowHeight = height
+        end
+        love.window.setMode(windowWidth, windowHeight, { resizable = not testWindow })
+    end
+    scale = (7.3 / 1200) * windowHeight
+
+
+    cam:zoomTo(scale)
+
 end

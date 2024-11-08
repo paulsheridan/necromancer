@@ -1,5 +1,7 @@
 local player = {}
 
+player.collider = world:newBSGRectangleCollider(100, 100, 8, 12, 3)
+player.collider:setFixedRotation(true)
 player.x = 100
 player.y = 100
 player.speed = 90
@@ -47,60 +49,12 @@ function player:stop()
         player.anim = player.animations.stopDown
     end
     player.anim:gotoFrame(1)
+    player.collider:setLinearVelocity(0, 0)
 end
 
 function player:update(dt)
-    player.prevDirX = player.dirX
-    player.prevDirY = player.dirY
-
-    local currentDirX = 0
-    local currentDirY = 0
-
-    local controlledCharacter = possessedNpc or player
-
-    if love.keyboard.isDown("d") or love.keyboard.isDown("right") then
-        controlledCharacter.dirX = 1
-        currentDirX = 1
-        controlledCharacter.x = controlledCharacter.x + controlledCharacter.speed * dt
-    elseif love.keyboard.isDown("a") or love.keyboard.isDown("left") then
-        controlledCharacter.dirX = -1
-        currentDirX = -1
-        controlledCharacter.x = controlledCharacter.x - controlledCharacter.speed * dt
-    end
-    if love.keyboard.isDown("s") or love.keyboard.isDown("down") then
-        controlledCharacter.dirY = 1
-        currentDirY = 1
-        controlledCharacter.y = controlledCharacter.y + controlledCharacter.speed * dt
-    elseif love.keyboard.isDown("w") or love.keyboard.isDown("up") then
-        controlledCharacter.dirY = -1
-        currentDirY = -1
-        controlledCharacter.y = controlledCharacter.y - controlledCharacter.speed * dt
-    end
-
-    cam:lookAt(controlledCharacter.x * scale, controlledCharacter.y * scale)
-
-    if player.dirX == 1 then
-        if player.dirY == 1 then
-            player.anim = player.animations.downRight
-        else
-            player.anim = player.animations.upRight
-        end
-    else
-        if player.dirY == 1 then
-            player.anim = player.animations.downLeft
-        else
-            player.anim = player.animations.upLeft
-        end
-    end
-
-    if currentDirX == 0 and currentDirY == 0 then
-        player.walking = false
-        player:stop()
-    else
-        player.walking = true
-    end
-
-    player.anim:update(dt)
+    player.x = player.collider:getX()
+    player.y = player.collider:getY()
 end
 
 return player
