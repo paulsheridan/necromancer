@@ -1,48 +1,65 @@
--- Load necessary libraries
-Camera = require 'libraries/hump/camera'
-cam = Camera(0, 0)
-cam.smoother = Camera.smooth.damped(8)
-
--- Require other files
-player = require 'player'
-world = require 'world'
-update = require 'update'
-
--- Game state
-local gamePaused = false
-local markedNpc = nil
-local possessedNpc = nil -- Track which NPC is possessed
-local menuOpen = false
-local selectedMenuIndex = 1 -- Tracks the selected NPC in the menu
-
--- Load function
 function love.load()
-    love.graphics.setBackgroundColor(0.2, 0.7, 0.3) -- Green background
-    world.spawnNpcs()
+    wf = require('libraries/windfield')
+    world = wf.newWorld(0,0)
+
+    vector = require("libraries/hump/vector")
+
+    anim8 = require('libraries/anim8')
+    love.graphics.setDefaultFilter("nearest", "nearest")
+
+    sti = require 'libraries/sti'
+    gameMap = sti('maps/zeldaLikeOverworld.lua')
+
+
+    player = require('src/player')
+    update = require('src/update')
+    utils = require('src/utilities')
+    npcUtils = require('src/npc')
+    character = require('src/character')
+    require('src/cam')
+
+    gamePaused = false
+    markedNpcs = {}
+    possessedNpc = nil
+    menuOpen = false
+    selectedMenuIndex = 1
+    numNpcs = 6
+    scale = 1
+
+
+    for i = 1, numNpcs do
+        local npc = spawnNpc(math.random(50, 400), math.random(50, 400))
+        table.insert(npcs, npc)
+    end
+
+    setWindowSize(fullscreen, 1920, 1080)
 end
 
--- Update function
 function love.update(dt)
     if not gamePaused then
-        -- Update the game state by calling the function from update.lua
-        update.updateGame(dt, player, world.npcs, cam, possessedNpc, gamePaused)
+        update.updateGame(dt)
     end
 end
 
--- Draw function
 function love.draw()
+    -- love.graphics.scale(scale)
     cam:attach()
-    -- Draw player and world objects
-    love.graphics.setColor(1, 0, 0)
-    love.graphics.rectangle("fill", player.x, player.y, player.width, player.height)
+        gameMap:drawLayer(gameMap.layers["GroundLayer"])
+        gameMap:drawLayer(gameMap.layers["GroundCover"])
+        player.anim:draw(player.spriteSheet, player.x, player.y - 2, nil, player.dirX, 1, 9.5, 10.5)
 
-    love.graphics.setColor(0.3, 0.5, 0.2)     -- Green color for bush
-    love.graphics.rectangle("fill", world.bush.x, world.bush.y, world.bush.width, world.bush.height)
+        for _, npc in ipairs(npcs) do
+            if npc.marked then
+                love.graphics.setColor(1, 1, 0) -- Yellow for marked NPCs
+            else
+                love.graphics.setColor(0, 0, 1) -- Blue for unmarked NPCs
+            end
+            npc.anim:draw(npc.spriteSheet, npc.x, npc.y - 2, nil, npc.dirX, 1, 9.5, 10.5)
+        end
 
-    world.drawWorld(markedNpc, possessedNpc)
-    cam:detach()
+        love.graphics.setColor(1, 1, 1)
+        world:draw()
 
-    -- Draw pause menu if game is paused
     if gamePaused then
         love.graphics.setColor(0, 0, 0, 0.5)
         love.graphics.rectangle("fill", 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
@@ -50,14 +67,13 @@ function love.draw()
         love.graphics.printf("Game Paused", 0, love.graphics.getHeight() / 2 - 10, love.graphics.getWidth(), "center")
     end
 
-    -- Draw marked NPC selection menu
     if menuOpen then
         love.graphics.setColor(0, 0, 0, 0.7)
         love.graphics.rectangle("fill", 100, 100, 200, 200)
         love.graphics.setColor(1, 1, 1)
         love.graphics.printf("Select an NPC to possess", 110, 110, 180, "center")
 
-        for i, npc in ipairs(world.markedNpcs) do
+        for i, npc in ipairs(markedNpcs) do
             if i == selectedMenuIndex then
                 love.graphics.setColor(1, 1, 0) -- Highlight selected NPC
             else
@@ -66,26 +82,55 @@ function love.draw()
             love.graphics.printf("NPC " .. i, 110, 120 + i * 20, 180, "center")
         end
     end
+    cam:detach()
 end
 
--- Key press handler
 function love.keypressed(key)
     if key == "p" then
         gamePaused = not gamePaused
     elseif key == "f" then
-        markedNpc = world.markNearbyNpc(player)
+        markedNpc = player:markNearbyNpc()
     elseif key == "m" then
-        menuOpen = not menuOpen -- Toggle the menu
-        selectedMenuIndex = 1   -- Reset selection when menu is opened
+        menuOpen = not menuOpen
+        selectedMenuIndex = 1
     elseif key == "e" and menuOpen then
-        -- Possess the selected NPC in the menu
-        possessedNpc = world.markedNpcs[selectedMenuIndex]
-        menuOpen = false                                                       -- Close the menu
+        possessedNpc = markedNpcs[selectedMenuIndex]
+        menuOpen = false
     elseif key == "up" and menuOpen then
-        selectedMenuIndex = math.max(1, selectedMenuIndex - 1)                 -- Move up
+        selectedMenuIndex = math.max(1, selectedMenuIndex - 1)
     elseif key == "down" and menuOpen then
-        selectedMenuIndex = math.min(#world.markedNpcs, selectedMenuIndex + 1) -- Move down
+        selectedMenuIndex = math.min(#markedNpcs, selectedMenuIndex + 1)
     elseif key == "e" and possessedNpc then
-        possessedNpc = nil                                                     -- Release control back to the player
+        possessedNpc = nil
+    elseif key == "o" then
+        scale = scale + 1
     end
+end
+
+function insertMarkedNpc(npc)
+    table.insert(markedNpcs, npc)
+end
+
+function setWindowSize(full, width, height)
+    if full then
+        fullscreen = true
+        love.window.setFullscreen(true)
+        windowWidth = love.graphics.getWidth()
+        windowHeight = love.graphics.getHeight()
+    else
+        fullscreen = false
+        if width == nil or height == nil then
+            windowWidth = 1920
+            windowHeight = 1080
+        else
+            windowWidth = width
+            windowHeight = height
+        end
+        love.window.setMode(windowWidth, windowHeight, { resizable = not testWindow })
+    end
+    scale = (7.3 / 1200) * windowHeight
+
+
+    cam:zoomTo(scale)
+
 end
