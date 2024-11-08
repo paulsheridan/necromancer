@@ -2,10 +2,10 @@ npcs = {}
 
 function spawnNpc(x, y)
     local npc = {}
-    npc.collider = world:newBSGRectangleCollider(100, 100, 8, 12, 3)
-    npc.collider:setFixedRotation(true)
     npc.x = x
     npc.y = y
+    npc.collider = world:newBSGRectangleCollider(x, y, 8, 12, 3)
+    npc.collider:setFixedRotation(true)
     npc.speed = 30
     npc.width = 10
     npc.height = 16
@@ -49,23 +49,30 @@ function spawnNpc(x, y)
         self.x = self.collider:getX()
         self.y = self.collider:getY()
 
+        local isMoving = false
+        local vx = 0
+        local vy = 0
+
         if self ~= possessedNpc then
             self.moveTimer = self.moveTimer + dt
             if self.moveTimer >= self.moveInterval then
                 self.moveTimer = 0
-                local directions = { "up", "down", "left", "right" }
+                local directions = { "up", "down", "left", "right", "stop" }
                 self.direction = directions[math.random(#directions)]
             end
 
             if self.direction == "up" then
-                self.y = self.y - self.speed * dt
+                vx = self.speed
             elseif self.direction == "down" then
-                self.y = self.y + self.speed * dt
+                vx = self.speed * -1
             elseif self.direction == "left" then
-                self.x = self.x - self.speed * dt
+                vy = self.speed
             elseif self.direction == "right" then
-                self.x = self.x + self.speed * dt
+                vy = self.speed * -1
+            elseif self.direction == "stop" then
+                vx, vy = 0, 0
             end
+            npc.collider:setLinearVelocity(vx, vy)
         end
     end
 
@@ -85,5 +92,12 @@ end
 function npcs:update(dt)
     for _, npc in ipairs(self) do
         npc:update(dt)
+    end
+end
+
+function npcs:spawn()
+    for i = 1, numNpcs do
+        local npc = spawnNpc(math.random(50, 400), math.random(50, 400))
+        table.insert(npcs, npc)
     end
 end

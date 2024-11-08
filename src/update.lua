@@ -5,6 +5,7 @@ function update.updateGame(dt)
     npcs:update(dt)
     updateControlledCharacter(dt)
     player:update(dt)
+    skeletons:update(dt)
     world:update(dt)
     cam:update(dt)
 end

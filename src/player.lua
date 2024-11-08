@@ -55,6 +55,7 @@ end
 function player:update(dt)
     player.x = player.collider:getX()
     player.y = player.collider:getY()
+    print("player xy: ", self.x, self.y)
 end
 
 return player

@@ -16,6 +16,7 @@ function love.load()
     utils = require('src/utilities')
     npcUtils = require('src/npc')
     character = require('src/character')
+    require('src/skeleton')
     require('src/cam')
 
     gamePaused = false
@@ -24,15 +25,18 @@ function love.load()
     menuOpen = false
     selectedMenuIndex = 1
     numNpcs = 6
-    scale = 1
 
-
-    for i = 1, numNpcs do
-        local npc = spawnNpc(math.random(50, 400), math.random(50, 400))
-        table.insert(npcs, npc)
+    walls = {}
+    if gameMap.layers["ObjectLayer"] then
+        for i, obj in pairs(gameMap.layers["ObjectLayer"].objects) do
+            local wall = world:newRectangleCollider(obj.x, obj.y, obj.width, obj.height)
+            wall:setType("static")
+            table.insert(walls, wall)
+        end
     end
 
-    setWindowSize(fullscreen, 1920, 1080)
+
+   npcs:spawn()
 end
 
 function love.update(dt)
@@ -42,7 +46,6 @@ function love.update(dt)
 end
 
 function love.draw()
-    -- love.graphics.scale(scale)
     cam:attach()
         gameMap:drawLayer(gameMap.layers["GroundLayer"])
         gameMap:drawLayer(gameMap.layers["GroundCover"])
@@ -56,9 +59,10 @@ function love.draw()
             end
             npc.anim:draw(npc.spriteSheet, npc.x, npc.y - 2, nil, npc.dirX, 1, 9.5, 10.5)
         end
+        skeletons:draw()
 
         love.graphics.setColor(1, 1, 1)
-        world:draw()
+    cam:detach()
 
     if gamePaused then
         love.graphics.setColor(0, 0, 0, 0.5)
@@ -82,7 +86,6 @@ function love.draw()
             love.graphics.printf("NPC " .. i, 110, 120 + i * 20, 180, "center")
         end
     end
-    cam:detach()
 end
 
 function love.keypressed(key)
@@ -102,35 +105,15 @@ function love.keypressed(key)
         selectedMenuIndex = math.min(#markedNpcs, selectedMenuIndex + 1)
     elseif key == "e" and possessedNpc then
         possessedNpc = nil
-    elseif key == "o" then
-        scale = scale + 1
+    elseif key == "g" then
+        skeletons:spawn(3, player)
+    elseif key == "t" then
+        skeletons:commandAttack()
+    elseif key == "r" then
+        skeletons:commandReturn()
     end
 end
 
 function insertMarkedNpc(npc)
     table.insert(markedNpcs, npc)
-end
-
-function setWindowSize(full, width, height)
-    if full then
-        fullscreen = true
-        love.window.setFullscreen(true)
-        windowWidth = love.graphics.getWidth()
-        windowHeight = love.graphics.getHeight()
-    else
-        fullscreen = false
-        if width == nil or height == nil then
-            windowWidth = 1920
-            windowHeight = 1080
-        else
-            windowWidth = width
-            windowHeight = height
-        end
-        love.window.setMode(windowWidth, windowHeight, { resizable = not testWindow })
-    end
-    scale = (7.3 / 1200) * windowHeight
-
-
-    cam:zoomTo(scale)
-
 end
