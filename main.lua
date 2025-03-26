@@ -8,16 +8,15 @@ function love.load()
     love.graphics.setDefaultFilter("nearest", "nearest")
 
     sti = require 'libraries/sti'
-    gameMap = sti('maps/zeldaLikeOverworld.lua')
+    gameMap = sti('maps/kenney/roguelikeMap.lua')
 
-
+    cam = require('src/cam')
     player = require('src/player')
     update = require('src/update')
     utils = require('src/utilities')
     npcUtils = require('src/npc')
     character = require('src/character')
-    require('src/skeleton')
-    require('src/cam')
+    skeletonUtils = require('src/skeleton')
 
     gamePaused = false
     markedNpcs = {}
@@ -27,14 +26,13 @@ function love.load()
     numNpcs = 6
 
     walls = {}
-    if gameMap.layers["ObjectLayer"] then
-        for i, obj in pairs(gameMap.layers["ObjectLayer"].objects) do
+    if gameMap.layers["Objects"] then
+        for i, obj in pairs(gameMap.layers["Objects"].objects) do
             local wall = world:newRectangleCollider(obj.x, obj.y, obj.width, obj.height)
             wall:setType("static")
             table.insert(walls, wall)
         end
     end
-
 
    npcs:spawn()
 end
@@ -49,7 +47,8 @@ function love.draw()
     cam:attach()
         gameMap:drawLayer(gameMap.layers["GroundLayer"])
         gameMap:drawLayer(gameMap.layers["GroundCover"])
-        player.anim:draw(player.spriteSheet, player.x, player.y - 2, nil, player.dirX, 1, 9.5, 10.5)
+        gameMap:drawLayer(gameMap.layers["BuildingLayer"])
+        player:draw()
 
         for _, npc in ipairs(npcs) do
             if npc.marked then
@@ -60,6 +59,8 @@ function love.draw()
             npc.anim:draw(npc.spriteSheet, npc.x, npc.y - 2, nil, npc.dirX, 1, 9.5, 10.5)
         end
         skeletons:draw()
+        gameMap:drawLayer(gameMap.layers["DoorWindowLayer"])
+        gameMap:drawLayer(gameMap.layers["RoofLayer"])
 
         love.graphics.setColor(1, 1, 1)
     cam:detach()

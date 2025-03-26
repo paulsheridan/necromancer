@@ -97,7 +97,7 @@ end
 
 function npcs:spawn()
     for i = 1, numNpcs do
-        local npc = spawnNpc(math.random(50, 400), math.random(50, 400))
+        local npc = spawnNpc(math.random(250, 600), math.random(250, 600))
         table.insert(npcs, npc)
     end
 end

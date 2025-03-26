@@ -2,8 +2,8 @@ local player = {}
 
 player.collider = world:newBSGRectangleCollider(100, 100, 8, 12, 3)
 player.collider:setFixedRotation(true)
-player.x = 100
-player.y = 100
+player.x = 300
+player.y = 300
 player.speed = 90
 player.width = 10
 player.height = 16
@@ -15,19 +15,15 @@ player.animSpeed = 0.14
 player.walking = false
 
 player.spriteSheet = love.graphics.newImage('sprites/playerSheet.png')
-player.grid = anim8.newGrid(19, 21, player.spriteSheet:getWidth(), player.spriteSheet:getHeight())
+player.grid = anim8.newGrid(16, 32, player.spriteSheet:getWidth(), player.spriteSheet:getHeight())
 
 player.animations = {}
-player.animations.downRight = anim8.newAnimation(player.grid('1-2', 1), player.animSpeed)
-player.animations.downLeft = anim8.newAnimation(player.grid('1-2', 1), player.animSpeed)
-player.animations.upRight = anim8.newAnimation(player.grid('1-2', 2), player.animSpeed)
-player.animations.upLeft = anim8.newAnimation(player.grid('1-2', 2), player.animSpeed)
-player.animations.stopDown = anim8.newAnimation(player.grid('1-3', 6), 0.22,
-    function() player.anim = player.animations.idleDown end)
-player.animations.stopUp = anim8.newAnimation(player.grid('1-3', 7), 0.22,
-    function() player.anim = player.animations.idleUp end)
-player.animations.idleDown = anim8.newAnimation(player.grid('1-4', 8), { 1.2, 0.1, 2.4, 0.1 })
-player.animations.idleUp = anim8.newAnimation(player.grid('1-2', 9), 0.22)
+player.animations.down = anim8.newAnimation(player.grid('1-1', 4), player.animSpeed)
+player.animations.right = anim8.newAnimation(player.grid('1-2', 4), player.animSpeed)
+player.animations.up = anim8.newAnimation(player.grid('1-3', 4), player.animSpeed)
+player.animations.left = anim8.newAnimation(player.grid('1-4', 4), player.animSpeed)
+player.animations.idleDown = anim8.newAnimation(player.grid('1-1', 1), 0.22)
+player.animations.idleUp = anim8.newAnimation(player.grid('3-1', 1), 0.22)
 
 player.anim = player.animations.idleDown
 
@@ -43,19 +39,22 @@ function player:markNearbyNpc()
 end
 
 function player:stop()
-    if player.prevDirY < 0 then
-        player.anim = player.animations.stopUp
+    if self.prevDirY < 0 then
+        self.anim = self.animations.idleUp
     else
-        player.anim = player.animations.stopDown
+        self.anim = self.animations.idleDown
     end
-    player.anim:gotoFrame(1)
-    player.collider:setLinearVelocity(0, 0)
+    self.anim:gotoFrame(1)
+    self.collider:setLinearVelocity(0, 0)
 end
 
 function player:update(dt)
     player.x = player.collider:getX()
     player.y = player.collider:getY()
-    print("player xy: ", self.x, self.y)
+end
+
+function player:draw()
+    player.anim:draw(player.spriteSheet, player.x, player.y - 2, nil, player.dirX, 1, 9.5, 10.5)
 end
 
 return player

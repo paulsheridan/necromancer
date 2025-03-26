@@ -28,18 +28,16 @@ function updateControlledCharacter(dt)
 
     cam:lookAt(controlledCharacter.x, controlledCharacter.y)
 
-    if controlledCharacter.dirX == 1 then
-        if controlledCharacter.dirY == 1 then
-            controlledCharacter.anim = controlledCharacter.animations.downRight
-        else
-            controlledCharacter.anim = controlledCharacter.animations.upRight
+    if currentDirY == 0 then
+        if currentDirX == 1 then
+            controlledCharacter.anim = controlledCharacter.animations.left
+        elseif currentDirX == -1 then
+            controlledCharacter.anim = controlledCharacter.animations.right
         end
-    else
-        if controlledCharacter.dirY == 1 then
-            controlledCharacter.anim = controlledCharacter.animations.downLeft
-        else
-            controlledCharacter.anim = controlledCharacter.animations.upLeft
-        end
+    elseif currentDirY == 1 then
+        controlledCharacter.anim = controlledCharacter.animations.down
+    elseif currentDirY == -1 then
+        controlledCharacter.anim = controlledCharacter.animations.up
     end
 
     local vec = vector(currentDirX, currentDirY):normalized() * controlledCharacter.speed
