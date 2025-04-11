@@ -1,12 +1,12 @@
+
 npcs = {}
 
 function spawnNpc(x, y)
-    local npc = {}
+    npc = world:newBSGRectangleCollider(x, y, 8, 12, 3)
+
     npc.x = x
     npc.y = y
-    npc.collider = world:newBSGRectangleCollider(x, y, 8, 12, 3)
-    npc.collider:setFixedRotation(true)
-    npc.speed = 30
+    npc.speed = 90
     npc.width = 10
     npc.height = 16
     npc.dirX = 1
@@ -19,21 +19,22 @@ function spawnNpc(x, y)
     npc.marked = false
     npc.animSpeed = 0.14
     npc.walking = false
+    npc.baseDamping = 12
 
-    npc.spriteSheet = love.graphics.newImage('sprites/npcSheet.png')
-    npc.grid = anim8.newGrid(19, 21, npc.spriteSheet:getWidth(), npc.spriteSheet:getHeight())
+    npc:setCollisionClass("Player")
+    npc:setFixedRotation(true)
+    npc:setLinearDamping(npc.baseDamping)
+
+    npc.spriteSheet = love.graphics.newImage('sprites/playerSheet.png')
+    npc.grid = anim8.newGrid(16, 32, npc.spriteSheet:getWidth(), npc.spriteSheet:getHeight())
 
     npc.animations = {}
-    npc.animations.downRight = anim8.newAnimation(npc.grid('1-2', 1), npc.animSpeed)
-    npc.animations.downLeft = anim8.newAnimation(npc.grid('1-2', 1), npc.animSpeed)
-    npc.animations.upRight = anim8.newAnimation(npc.grid('1-2', 2), npc.animSpeed)
-    npc.animations.upLeft = anim8.newAnimation(npc.grid('1-2', 2), npc.animSpeed)
-    npc.animations.stopDown = anim8.newAnimation(npc.grid('1-3', 6), 0.22,
-        function() npc.anim = npc.animations.idleDown end)
-    npc.animations.stopUp = anim8.newAnimation(npc.grid('1-3', 7), 0.22,
-        function() npc.anim = npc.animations.idleUp end)
-    npc.animations.idleDown = anim8.newAnimation(npc.grid('1-4', 8), { 1.2, 0.1, 2.4, 0.1 })
-    npc.animations.idleUp = anim8.newAnimation(npc.grid('1-2', 9), 0.22)
+    npc.animations.down = anim8.newAnimation(npc.grid('1-1', 4), npc.animSpeed)
+    npc.animations.right = anim8.newAnimation(npc.grid('1-2', 4), npc.animSpeed)
+    npc.animations.up = anim8.newAnimation(npc.grid('1-3', 4), npc.animSpeed)
+    npc.animations.left = anim8.newAnimation(npc.grid('1-4', 4), npc.animSpeed)
+    npc.animations.idleDown = anim8.newAnimation(npc.grid('1-1', 1), 0.22)
+    npc.animations.idleUp = anim8.newAnimation(npc.grid('3-1', 1), 0.22)
 
     npc.anim = npc.animations.idleDown
 
@@ -46,8 +47,8 @@ function spawnNpc(x, y)
     end
 
     function npc:update(dt)
-        self.x = self.collider:getX()
-        self.y = self.collider:getY()
+        self.x = self:getX()
+        self.y = self:getY()
 
         local isMoving = false
         local vx = 0
@@ -72,18 +73,27 @@ function spawnNpc(x, y)
             elseif self.direction == "stop" then
                 vx, vy = 0, 0
             end
-            npc.collider:setLinearVelocity(vx, vy)
+            self:setLinearVelocity(vx, vy)
         end
     end
 
     function npc:stop()
-        if npc.prevDirY < 0 then
-            npc.anim = npc.animations.stopUp
+        if self.prevDirY < 0 then
+            self.anim = self.animations.idleUp
         else
-            npc.anim = npc.animations.stopDown
+            self.anim = self.animations.idleDown
         end
-        npc.anim:gotoFrame(1)
-        npc.collider:setLinearVelocity(0, 0)
+        self.anim:gotoFrame(1)
+        self:setLinearVelocity(0, 0)
+    end
+
+    function npc:draw()
+        local scaleX = 1
+        if npc.anim == npc.animations.left then
+            scaleX = -1
+        end
+
+        npc.anim:draw(npc.spriteSheet, npc.x, npc.y - 2, nil, scaleX, 1, 9.5, 10.5)
     end
 
     return npc

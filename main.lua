@@ -1,29 +1,14 @@
 function love.load()
-    wf = require('libraries/windfield')
-    world = wf.newWorld(0,0)
 
-    vector = require("libraries/hump/vector")
-
-    anim8 = require('libraries/anim8')
-    love.graphics.setDefaultFilter("nearest", "nearest")
-
-    sti = require 'libraries/sti'
-    gameMap = sti('maps/kenney/roguelikeMap.lua')
-
-    cam = require('src/cam')
-    player = require('src/player')
-    update = require('src/update')
-    utils = require('src/utilities')
-    npcUtils = require('src/npc')
-    character = require('src/character')
-    skeletonUtils = require('src/skeleton')
+    require("src/startup/gameStart")
+    gameStart()
 
     gamePaused = false
     markedNpcs = {}
     possessedNpc = nil
     menuOpen = false
     selectedMenuIndex = 1
-    numNpcs = 6
+    numNpcs = 4
 
     walls = {}
     if gameMap.layers["Objects"] then
@@ -39,30 +24,13 @@ end
 
 function love.update(dt)
     if not gamePaused then
-        update.updateGame(dt)
+        updateAll(dt)
     end
 end
 
 function love.draw()
     cam:attach()
-        gameMap:drawLayer(gameMap.layers["GroundLayer"])
-        gameMap:drawLayer(gameMap.layers["GroundCover"])
-        gameMap:drawLayer(gameMap.layers["BuildingLayer"])
-        player:draw()
-
-        for _, npc in ipairs(npcs) do
-            if npc.marked then
-                love.graphics.setColor(1, 1, 0) -- Yellow for marked NPCs
-            else
-                love.graphics.setColor(0, 0, 1) -- Blue for unmarked NPCs
-            end
-            npc.anim:draw(npc.spriteSheet, npc.x, npc.y - 2, nil, npc.dirX, 1, 9.5, 10.5)
-        end
-        skeletons:draw()
-        gameMap:drawLayer(gameMap.layers["DoorWindowLayer"])
-        gameMap:drawLayer(gameMap.layers["RoofLayer"])
-
-        love.graphics.setColor(1, 1, 1)
+        drawCamera()
     cam:detach()
 
     if gamePaused then
@@ -106,12 +74,6 @@ function love.keypressed(key)
         selectedMenuIndex = math.min(#markedNpcs, selectedMenuIndex + 1)
     elseif key == "e" and possessedNpc then
         possessedNpc = nil
-    elseif key == "g" then
-        skeletons:spawn(3, player)
-    elseif key == "t" then
-        skeletons:commandAttack()
-    elseif key == "r" then
-        skeletons:commandReturn()
     end
 end
 

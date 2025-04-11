@@ -1,5 +1,5 @@
 function updateControlledCharacter(dt)
-    local controlledCharacter = possessedNpc or player
+    controlledCharacter = possessedNpc or player
 
     controlledCharacter.prevDirX = controlledCharacter.dirX
     controlledCharacter.prevDirY = controlledCharacter.dirY
@@ -26,23 +26,19 @@ function updateControlledCharacter(dt)
         controlledCharacter.y = controlledCharacter.y - controlledCharacter.speed * dt
     end
 
-    cam:lookAt(controlledCharacter.x, controlledCharacter.y)
-
-    if currentDirY == 0 then
-        if currentDirX == 1 then
-            controlledCharacter.anim = controlledCharacter.animations.left
-        elseif currentDirX == -1 then
-            controlledCharacter.anim = controlledCharacter.animations.right
-        end
-    elseif currentDirY == 1 then
+    if currentDirY == 1 then
         controlledCharacter.anim = controlledCharacter.animations.down
     elseif currentDirY == -1 then
         controlledCharacter.anim = controlledCharacter.animations.up
+    elseif currentDirX == 1 then
+        controlledCharacter.anim = controlledCharacter.animations.left
+    elseif currentDirX == -1 then
+        controlledCharacter.anim = controlledCharacter.animations.right
     end
 
     local vec = vector(currentDirX, currentDirY):normalized() * controlledCharacter.speed
     if vec.x ~= 0 or vec.y ~= 0 then
-        controlledCharacter.collider:setLinearVelocity(vec.x, vec.y)
+        controlledCharacter:setLinearVelocity(vec.x, vec.y)
     end
 
     if currentDirX == 0 and currentDirY == 0 then

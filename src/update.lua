@@ -1,13 +1,11 @@
-local update = {}
+function updateAll(dt)
+    updateGame(dt)
+end
 
--- Update game state
-function update.updateGame(dt)
+function updateGame(dt)
+    player:update(dt)
     npcs:update(dt)
     updateControlledCharacter(dt)
-    player:update(dt)
-    skeletons:update(dt)
     world:update(dt)
     cam:update(dt)
 end
-
-return update

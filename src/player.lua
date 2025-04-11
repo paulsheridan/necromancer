@@ -1,9 +1,6 @@
-local player = {}
-
-player.collider = world:newBSGRectangleCollider(100, 100, 8, 12, 3)
-player.collider:setFixedRotation(true)
-player.x = 300
-player.y = 300
+player = world:newBSGRectangleCollider(234, 184, 12, 12, 3)
+player.x = 0
+player.y = 0
 player.speed = 90
 player.width = 10
 player.height = 16
@@ -13,6 +10,11 @@ player.prevDirX = 1
 player.prevDirY = 1
 player.animSpeed = 0.14
 player.walking = false
+player.baseDamping = 12
+
+player:setCollisionClass("Player")
+player:setFixedRotation(true)
+player:setLinearDamping(player.baseDamping)
 
 player.spriteSheet = love.graphics.newImage('sprites/playerSheet.png')
 player.grid = anim8.newGrid(16, 32, player.spriteSheet:getWidth(), player.spriteSheet:getHeight())
@@ -45,16 +47,19 @@ function player:stop()
         self.anim = self.animations.idleDown
     end
     self.anim:gotoFrame(1)
-    self.collider:setLinearVelocity(0, 0)
+    self:setLinearVelocity(0, 0)
 end
 
 function player:update(dt)
-    player.x = player.collider:getX()
-    player.y = player.collider:getY()
+    player.x = player:getX()
+    player.y = player:getY()
 end
 
 function player:draw()
-    player.anim:draw(player.spriteSheet, player.x, player.y - 2, nil, player.dirX, 1, 9.5, 10.5)
-end
+    local scaleX = 1
+    if player.anim == player.animations.left then
+        scaleX = -1
+    end
 
-return player
+    player.anim:draw(player.spriteSheet, player.x, player.y - 2, nil, scaleX, 1, 9.5, 10.5)
+end
