@@ -5,7 +5,7 @@ end
 function updateGame(dt)
     player:update(dt)
     npcs:update(dt)
-    updateControlledCharacter(dt)
+    -- updateControlledCharacter(dt)
     world:update(dt)
     cam:update(dt)
 end

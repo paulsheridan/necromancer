@@ -3,7 +3,7 @@ cam = Camera(0, 0, scale)
 cam.smoother = Camera.smooth.damped(8)
 
 function cam:update(dt)
-    local camX, camY = controlledCharacter:getPosition()
+    local camX, camY = player:getPosition()
 
     -- This section prevents the camera from viewing outside the background
     -- First, get width/height of the game window, divided by the game scale

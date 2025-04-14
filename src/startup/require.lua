@@ -7,6 +7,5 @@ function requireAll()
     require('src/player')
     require('src/update')
     require('src/npcs')
-    require('src/character')
     require('src/draw')
 end

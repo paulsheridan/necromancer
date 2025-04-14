@@ -2,20 +2,20 @@ function drawBeforeCamera()
 end
 
 function drawCamera()
-    if gameMap.layers["GroundLayer"] then
-        gameMap:drawLayer(gameMap.layers["GroundLayer"])
+    if gameMap.layers["Background"] then
+        gameMap:drawLayer(gameMap.layers["Background"])
     end
-    if gameMap.layers["GroundCover"] then
-        gameMap:drawLayer(gameMap.layers["GroundCover"])
+
+    if gameMap.layers["Base"] then
+        gameMap:drawLayer(gameMap.layers["Base"])
     end
-    if gameMap.layers["BuildingLayer"] then
-        gameMap:drawLayer(gameMap.layers["BuildingLayer"])
+
+    if gameMap.layers["Objects"] then
+        gameMap:drawLayer(gameMap.layers["Objects"])
     end
-    if gameMap.layers["DoorWindowLayer"] then
-        gameMap:drawLayer(gameMap.layers["DoorWindowLayer"])
-    end
-    if gameMap.layers["RoofLayer"] then
-        gameMap:drawLayer(gameMap.layers["RoofLayer"])
+
+    if gameMap.layers["Objects2"] then
+        gameMap:drawLayer(gameMap.layers["Objects2"])
     end
     player:draw()
     for _, npc in ipairs(npcs) do

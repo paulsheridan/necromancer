@@ -24,7 +24,7 @@ function gameStart()
     vector = require "libraries/hump/vector"
     flux = require "libraries/flux/flux"
     anim8 = require("libraries/anim8/anim8")
-    sti = require("libraries/sti")
+    sti = require("libraries/Simple-Tiled-Implementation/sti")
 
     local windfield = require("libraries/windfield")
     world = windfield.newWorld(0, 0, false)
@@ -37,7 +37,7 @@ function gameStart()
 
     love.graphics.setDefaultFilter("nearest", "nearest")
 
-    gameMap = sti('maps/kenney/roguelikeMap.lua')
+    gameMap = sti('maps/test.lua')
 
     require("src/startup/require")
     requireAll()

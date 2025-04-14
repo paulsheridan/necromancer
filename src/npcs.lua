@@ -6,7 +6,7 @@ function spawnNpc(x, y)
 
     npc.x = x
     npc.y = y
-    npc.speed = 90
+    npc.speed = 40
     npc.width = 10
     npc.height = 16
     npc.dirX = 1
@@ -39,52 +39,52 @@ function spawnNpc(x, y)
     npc.anim = npc.animations.idleDown
 
     function npc:mark()
-        self.marked = true
+        npc.marked = true
     end
 
     function npc:isMarked()
-        return self.marked
+        return npc.marked
     end
 
     function npc:update(dt)
-        self.x = self:getX()
-        self.y = self:getY()
+        npc.x = npc:getX()
+        npc.y = npc:getY()
 
         local isMoving = false
         local vx = 0
         local vy = 0
 
-        if self ~= possessedNpc then
-            self.moveTimer = self.moveTimer + dt
-            if self.moveTimer >= self.moveInterval then
-                self.moveTimer = 0
+        if npc ~= possessedNpc then
+            npc.moveTimer = npc.moveTimer + dt
+            if npc.moveTimer >= npc.moveInterval then
+                npc.moveTimer = 0
                 local directions = { "up", "down", "left", "right", "stop" }
-                self.direction = directions[math.random(#directions)]
+                npc.direction = directions[math.random(#directions)]
             end
 
-            if self.direction == "up" then
-                vx = self.speed
-            elseif self.direction == "down" then
-                vx = self.speed * -1
-            elseif self.direction == "left" then
-                vy = self.speed
-            elseif self.direction == "right" then
-                vy = self.speed * -1
-            elseif self.direction == "stop" then
+            if npc.direction == "up" then
+                vx = npc.speed
+            elseif npc.direction == "down" then
+                vx = npc.speed * -1
+            elseif npc.direction == "left" then
+                vy = npc.speed
+            elseif npc.direction == "right" then
+                vy = npc.speed * -1
+            elseif npc.direction == "stop" then
                 vx, vy = 0, 0
             end
-            self:setLinearVelocity(vx, vy)
+            npc:setLinearVelocity(vx, vy)
         end
     end
 
     function npc:stop()
-        if self.prevDirY < 0 then
-            self.anim = self.animations.idleUp
+        if npc.prevDirY < 0 then
+            npc.anim = npc.animations.idleUp
         else
-            self.anim = self.animations.idleDown
+            npc.anim = npc.animations.idleDown
         end
-        self.anim:gotoFrame(1)
-        self:setLinearVelocity(0, 0)
+        npc.anim:gotoFrame(1)
+        npc:setLinearVelocity(0, 0)
     end
 
     function npc:draw()
@@ -100,7 +100,7 @@ function spawnNpc(x, y)
 end
 
 function npcs:update(dt)
-    for _, npc in ipairs(self) do
+    for _, npc in ipairs(npc) do
         npc:update(dt)
     end
 end
