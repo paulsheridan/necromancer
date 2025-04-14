@@ -37,7 +37,7 @@ function gameStart()
 
     love.graphics.setDefaultFilter("nearest", "nearest")
 
-    gameMap = sti('maps/test.lua')
+    gameMap = sti('maps/kenney/roguelikeMap.lua')
 
     require("src/startup/require")
     requireAll()
