@@ -1,0 +1,63 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "testOne.tmx",
+    "expandedProjectPaths": [
+        "."
+    ],
+    "file.lastUsedOpenFilter": "All Files (*)",
+    "fileStates": {
+        "/Users/paulsheridan/projects/love/necromancer/maps/kenney/roguelikeProject.tmx": {
+            "scale": 0.562875,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 399.7335109926716,
+                "y": 400.6218076837664
+            }
+        },
+        "/Users/paulsheridan/projects/love/necromancer/maps/kenney/roguelikeProject.tmx#Roguelike": {
+            "scaleInDock": 1
+        },
+        "/Users/paulsheridan/projects/love/necromancer/maps/kenney/roguelikeProject.tmx#kenneyTileset": {
+            "scaleInDock": 1
+        },
+        "testOne.tmx": {
+            "scale": 1.9138541666666666,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 236.17264464159365,
+                "y": 208.74108746530234
+            }
+        },
+        "testOne.tmx#tilemap_packed": {
+            "scaleInDock": 1
+        },
+        "tilemap_packed.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        }
+    },
+    "last.exportedFilePath": "/Users/paulsheridan/projects/love/necromancer/maps/testOne",
+    "last.imagePath": "/Users/paulsheridan/projects/love/necromancer/sprites",
+    "map.lastUsedExportFilter": "Lua files (*.lua)",
+    "map.lastUsedFormat": "tmx",
+    "map.tileHeight": 16,
+    "map.tileWidth": 16,
+    "openFiles": [
+        "testOne.tmx"
+    ],
+    "project": "testMap.tiled-project",
+    "recentFiles": [
+        "testOne.tmx",
+        "tilemap_packed.tsx"
+    ],
+    "tileset.embedInMap": true,
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.tileSize": {
+        "height": 16,
+        "width": 16
+    }
+}
