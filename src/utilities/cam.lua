@@ -34,7 +34,6 @@ function cam:update(dt)
     end
 
     cam:lockPosition(camX, camY)
-    print("Camera position:", camX, camY)
 
     -- cam.x and cam.y keep track of where the camera is located
     -- the lookAt value may be moved if a screenshake is happening, so these

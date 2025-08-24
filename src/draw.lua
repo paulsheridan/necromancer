@@ -16,7 +16,7 @@ function drawCamera()
     end
     player:draw()
     for _, npc in ipairs(npcs) do
-        npc.anim:draw(npc.spriteSheet, npc.x, npc.y - 2, nil, npc.dirX, 1, 9.5, 10.5)
+        npc:draw()
     end
     if gameMap.layers["RoofLayer"] then
         gameMap:drawLayer(gameMap.layers["RoofLayer"])
