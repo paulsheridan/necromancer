@@ -18,12 +18,10 @@ function cam:update(dt)
     if camX < w / 2 then
         camX = w / 2
     end
-
-    -- Right border
+    -- Top border
     if camY < h / 2 then
         camY = h / 2
     end
-
     -- Right border
     if camX > (mapW - w / 2) then
         camX = (mapW - w / 2)
