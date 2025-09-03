@@ -14,4 +14,4 @@ function BodyPart:describe()
     return self.name .. " (" .. self.slot .. ")"
 end
 
-return BodyPart -- 👈 this is the key line
+return BodyPart

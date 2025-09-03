@@ -1,3 +1,6 @@
+local BodyPartPickup = require("src/monster/bodypartPickup")
+bodyParts = {}
+
 function love.load()
     require("src/startup/gameStart")
     gameStart()
@@ -19,6 +22,9 @@ function love.load()
     end
 
     npcs:spawn()
+
+    table.insert(bodyParts, BodyPartPickup.new(30, 20, "Rotten Torso", "torso", { strength = 2 }))
+    table.insert(bodyParts, BodyPartPickup.new(35, 20, "Stitched Head", "head", { intelligence = 1 }))
 end
 
 function love.update(dt)
@@ -47,7 +53,7 @@ function love.draw()
 
         for i, npc in ipairs(markedNpcs) do
             if i == selectedMenuIndex then
-                love.graphics.setColor(1, 1, 0) -- Highlight selected NPC
+                -- love.graphics.setColor(1, 1, 0) -- Highlight selected NPC
             else
                 love.graphics.setColor(1, 1, 1)
             end
