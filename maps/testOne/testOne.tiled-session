@@ -1,0 +1,41 @@
+{
+    "activeFile": "",
+    "expandedProjectPaths": [
+    ],
+    "fileStates": {
+        "": {
+            "scaleInDock": 1
+        },
+        "/Users/paulsheridan/projects/love/necromancer/maps/kenney/roguelikeProject.tmx": {
+            "scale": 1.6751,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": 235.80681750343263,
+                "y": 235.2098382186138
+            }
+        },
+        "/Users/paulsheridan/projects/love/necromancer/maps/kenney/roguelikeProject.tmx#Roguelike": {
+            "scaleInDock": 2.9137
+        },
+        "/Users/paulsheridan/projects/love/necromancer/maps/kenney/roguelikeProject.tmx#kenneyTileset": {
+            "scaleInEditor": 1
+        },
+        "testOne.tmx": {
+            "scale": 2.867,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 62.08580397628184,
+                "y": 105.33658876874783
+            }
+        },
+        "testOne.tmx#tilemap_packed": {
+            "scaleInDock": 2.2347
+        }
+    },
+    "openFiles": [
+    ],
+    "project": "testOne.tiled-project",
+    "recentFiles": [
+        "testOne.tmx"
+    ]
+}

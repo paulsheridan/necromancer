@@ -23,21 +23,33 @@ function love.load()
 
     npcs:spawn()
 
-    table.insert(bodyParts, BodyPartPickup.new(30, 20, "Rotten Torso", "torso", { strength = 2 }))
-    table.insert(bodyParts, BodyPartPickup.new(35, 20, "Stitched Head", "head", { intelligence = 1 }))
+    table.insert(bodyParts, BodyPartPickup.new(75, 400, "Rotten Torso", "torso", { strength = 2 }))
+    table.insert(bodyParts, BodyPartPickup.new(35, 400, "Stitched Head", "head", { intelligence = 1 }))
 end
 
 function love.update(dt)
     if not gamePaused then
         updateAll(dt)
+
+        -- update all body parts
+        for _, part in ipairs(bodyParts) do
+            part:update(dt, player)
+        end
     end
 end
 
 function love.draw()
     cam:attach()
     drawCamera()
+
+    -- draw body parts in world space
+    for _, part in ipairs(bodyParts) do
+        part:draw()
+    end
+
     cam:detach()
 
+    -- HUD / menus stay outside of camera
     if gamePaused then
         love.graphics.setColor(0, 0, 0, 0.5)
         love.graphics.rectangle("fill", 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
@@ -46,6 +58,7 @@ function love.draw()
     end
 
     if menuOpen then
+        -- === NPC selection window ===
         love.graphics.setColor(0, 0, 0, 0.7)
         love.graphics.rectangle("fill", 100, 100, 200, 200)
         love.graphics.setColor(1, 1, 1)
@@ -53,11 +66,33 @@ function love.draw()
 
         for i, npc in ipairs(markedNpcs) do
             if i == selectedMenuIndex then
-                -- love.graphics.setColor(1, 1, 0) -- Highlight selected NPC
+                love.graphics.setColor(1, 1, 0) -- Highlight selected NPC
             else
                 love.graphics.setColor(1, 1, 1)
             end
             love.graphics.printf("NPC " .. i, 110, 120 + i * 20, 180, "center")
+        end
+
+        -- === Inventory window ===
+        local invX, invY = 320, 100
+        love.graphics.setColor(0, 0, 0, 0.7)
+        love.graphics.rectangle("fill", invX, invY, 200, 200)
+
+        love.graphics.setColor(1, 1, 1)
+        love.graphics.printf("Inventory", invX, invY + 5, 200, "center")
+
+        if player.inventory and #player.inventory.items > 0 then
+            for i, part in ipairs(player.inventory.items) do
+                love.graphics.printf(
+                    part.name .. " (" .. part.slot .. ")",
+                    invX + 10,
+                    invY + 20 + i * 20,
+                    180,
+                    "left"
+                )
+            end
+        else
+            love.graphics.printf("Empty", invX, invY + 40, 200, "center")
         end
     end
 end

@@ -1,3 +1,5 @@
+local Inventory = require("src/inventory")
+
 player = world:newBSGRectangleCollider(234, 184, 12, 12, 3)
 player.x = 0
 player.y = 0
@@ -14,6 +16,8 @@ player.baseDamping = 12
 player:setCollisionClass("Player")
 player:setFixedRotation(true)
 player:setLinearDamping(player.baseDamping)
+
+player.inventory            = Inventory.new()
 
 player.spriteSheet          = love.graphics.newImage("sprites/tilemap_packed.png")
 player.grid                 = anim8.newGrid(16, 16, player.spriteSheet:getWidth(), player.spriteSheet:getHeight())
@@ -91,4 +95,16 @@ function player:draw()
     -- Debug: show prevDir on screen
     love.graphics.setColor(1, 1, 1, 1) -- reset color to white
     love.graphics.print("prevDir: " .. tostring(self.prevDir), 10, 10)
+end
+
+function player:addBodyPart(name, slot, attributes)
+    if not self.inventory then return end
+    local part = BodyPart.new(name, slot, attributes)
+    self.inventory:add(part)
+end
+
+function player:showInventory()
+    if self.inventory then
+        self.inventory:list()
+    end
 end
