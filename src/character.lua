@@ -1,6 +1,12 @@
 function updateControlledCharacter(dt)
-    controlledCharacter = possessedNpc or player
+    -- 🚪 Block movement while menus are active
+    if menuOpen or stationMenuOpen then
+        controlledCharacter:setLinearVelocity(0, 0)
+        controlledCharacter:stop()
+        return
+    end
 
+    controlledCharacter = possessedNpc or player
     local currentDirX = 0
     local currentDirY = 0
 

@@ -1,4 +1,5 @@
 local Inventory = require("src/inventory")
+local BodyPart = require("src/monster/bodypart")
 
 player = world:newBSGRectangleCollider(234, 184, 12, 12, 3)
 player.x = 0
@@ -6,9 +7,9 @@ player.y = 0
 player.speed = 90
 player.width = 10
 player.height = 16
-player.dirX = 0         -- no movement until input
+player.dirX = 0
 player.dirY = 0
-player.prevDir = "down" -- default facing down at start
+player.prevDir = "down"
 player.animSpeed = 0.14
 player.walking = false
 player.baseDamping = 12
@@ -58,7 +59,7 @@ function player:stop()
     elseif self.prevDir == "right" then
         self.anim = self.animations.idleRight
     else
-        self.anim = self.animations.idleDown -- fallback
+        self.anim = self.animations.idleDown
     end
 
     self.anim:gotoFrame(1)
@@ -72,7 +73,7 @@ function player:update(dt)
 
     -- Use actual body velocity, not inputs
     local vx, vy = self:getLinearVelocity()
-    local eps = 5 -- pixels/sec threshold to ignore tiny jitter
+    local eps = 5
 
     if math.abs(vx) > eps or math.abs(vy) > eps then
         if math.abs(vx) > math.abs(vy) then
@@ -91,10 +92,6 @@ function player:draw()
     end
 
     self.anim:draw(self.spriteSheet, self.x, self.y - 2, nil, scaleX, 1, 9.5, 10.5)
-
-    -- Debug: show prevDir on screen
-    love.graphics.setColor(1, 1, 1, 1) -- reset color to white
-    love.graphics.print("prevDir: " .. tostring(self.prevDir), 10, 10)
 end
 
 function player:addBodyPart(name, slot, attributes)

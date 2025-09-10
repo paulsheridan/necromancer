@@ -1,17 +1,18 @@
 {
-    "activeFile": "",
+    "activeFile": "/Users/paulsheridan/projects/love/necromancer/maps/kenney/roguelikeProject.tmx",
     "expandedProjectPaths": [
     ],
+    "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
         "": {
             "scaleInDock": 1
         },
         "/Users/paulsheridan/projects/love/necromancer/maps/kenney/roguelikeProject.tmx": {
-            "scale": 1.6751,
-            "selectedLayer": 3,
+            "scale": 3.4314,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 235.80681750343263,
-                "y": 235.2098382186138
+                "x": 474.8790581103923,
+                "y": 323.3374133006936
             }
         },
         "/Users/paulsheridan/projects/love/necromancer/maps/kenney/roguelikeProject.tmx#Roguelike": {
@@ -33,9 +34,11 @@
         }
     },
     "openFiles": [
+        "/Users/paulsheridan/projects/love/necromancer/maps/kenney/roguelikeProject.tmx"
     ],
     "project": "testOne.tiled-project",
     "recentFiles": [
+        "/Users/paulsheridan/projects/love/necromancer/maps/kenney/roguelikeProject.tmx",
         "testOne.tmx"
     ]
 }

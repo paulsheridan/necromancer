@@ -29,8 +29,9 @@ end
 
 function BodyPartPickup:draw()
     if not self.pickedUp then
-        love.graphics.setColor(1, 1, 1)
-        love.graphics.draw(spriteSheet, quads[self.slot], self.x, self.y)
+        love.graphics.setColor(1, 0.5, 0, 1) -- orange
+        love.graphics.rectangle("fill", self.x, self.y, 8, 8)
+        love.graphics.setColor(1, 1, 1, 1)   -- reset to white
     end
 end
 

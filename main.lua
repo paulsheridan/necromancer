@@ -3,16 +3,57 @@ bodyParts = {}
 
 assemblyStation = { x = 400, y = 200, w = 32, h = 32 }
 stationMenuOpen = false
+slotSelectionMenuOpen = false
 
 equippedParts = {
     head = nil,
     torso = nil,
-    arms = nil,
-    legs = nil
+    leftArm = nil,
+    rightArm = nil,
+    leftLeg = nil,
+    rightLeg = nil
 }
 selectedSlotIndex = 1
-slots = { "head", "torso", "arms", "legs" }
+slots = {
+    { label = "head",          key = "head" },
+    { label = "torso",         key = "torso" },
+    { label = "left arm",      key = "leftArm" },
+    { label = "right arm",     key = "rightArm" },
+    { label = "left leg",      key = "leftLeg" },
+    { label = "right leg",     key = "rightLeg" },
+    { label = "BUILD MONSTER", key = "BUILD" }
+}
 
+filteredParts = {}
+selectedFilteredIndex = 1
+
+function allSlotsFilled()
+    for _, slot in ipairs(slots) do
+        if slot.key ~= "BUILD" and not equippedParts[slot.key] then
+            return false
+        end
+    end
+    return true
+end
+
+function spawnBuiltMonster()
+    local monster = spawnMonster(assemblyStation.x + 50, assemblyStation.y + 50)
+    table.insert(monsters, monster)
+
+    -- ✅ Add monster to controllable pool (same as NPCs)
+    insertMarkedNpc(monster)
+
+    -- Clear equipped slots
+    for _, slot in ipairs(slots) do
+        if slot.key ~= "BUILD" then
+            equippedParts[slot.key] = nil
+        end
+    end
+
+    -- Close menus
+    stationMenuOpen = false
+    slotSelectionMenuOpen = false
+end
 
 function love.load()
     require("src/startup/gameStart")
@@ -38,15 +79,27 @@ function love.load()
 
     npcs:spawn()
 
-    table.insert(bodyParts, BodyPartPickup.new(75, 400, "Rotten Torso", "torso", { strength = 2 }))
-    table.insert(bodyParts, BodyPartPickup.new(35, 400, "Stitched Head", "head", { intelligence = 1 }))
+    -- Spawn pickups in the world
+    table.insert(bodyParts, BodyPartPickup.new(400, 600, "Fresh Left Arm", "leftArm", { strength = 1 }))
+    table.insert(bodyParts, BodyPartPickup.new(450, 600, "Fresh Right Arm", "rightArm", { strength = 2 }))
+    table.insert(bodyParts, BodyPartPickup.new(400, 650, "Fresh Left Leg", "leftLeg", { speed = 1 }))
+    table.insert(bodyParts, BodyPartPickup.new(450, 650, "Putrid Right Leg", "rightLeg", { speed = 1 }))
+    table.insert(bodyParts, BodyPartPickup.new(425, 625, "Putrid Head", "head", { smarts = 3 }))
+    table.insert(bodyParts, BodyPartPickup.new(475, 625, "Putrid Torso", "torso", { toughness = 4 }))
+
+    -- give player some sample parts
+    player:addBodyPart("Rotten Left Arm", "leftArm", { strength = 1 })
+    player:addBodyPart("Rotten Right Arm", "rightArm", { strength = 2 })
+    player:addBodyPart("Zombie Left Leg", "leftLeg", { speed = 1 })
+    player:addBodyPart("Zombie Right Leg", "rightLeg", { speed = 1 })
+    player:addBodyPart("Rotten Head", "head", { smarts = 3 })
+    player:addBodyPart("Rotten Torso", "torso", { toughness = 4 })
 end
 
 function love.update(dt)
     if not gamePaused then
         updateAll(dt)
 
-        -- update all body parts
         for _, part in ipairs(bodyParts) do
             part:update(dt, player)
         end
@@ -62,14 +115,20 @@ function love.draw()
         part:draw()
     end
 
+    -- draw monsters
+    for _, monster in ipairs(monsters) do
+        monster:draw()
+    end
+
+
     -- draw assembly station
-    love.graphics.setColor(0.2, 0.8, 0.2) -- green square
+    love.graphics.setColor(0.2, 0.8, 0.2)
     love.graphics.rectangle("fill", assemblyStation.x, assemblyStation.y, assemblyStation.w, assemblyStation.h)
     love.graphics.setColor(1, 1, 1)
 
     cam:detach()
 
-    -- HUD / menus stay outside of camera
+    -- pause overlay
     if gamePaused then
         love.graphics.setColor(0, 0, 0, 0.5)
         love.graphics.rectangle("fill", 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
@@ -77,8 +136,9 @@ function love.draw()
         love.graphics.printf("Game Paused", 0, love.graphics.getHeight() / 2 - 10, love.graphics.getWidth(), "center")
     end
 
+    -- NPC + Inventory menu
     if menuOpen then
-        -- === NPC window ===
+        -- NPC window
         love.graphics.setColor(0, 0, 0, 0.7)
         love.graphics.rectangle("fill", 100, 100, 200, 200)
         love.graphics.setColor(1, 1, 1)
@@ -86,14 +146,14 @@ function love.draw()
 
         for i, npc in ipairs(markedNpcs) do
             if menuPane == "npcs" and i == selectedMenuIndex then
-                love.graphics.setColor(1, 1, 0) -- highlight
+                love.graphics.setColor(1, 1, 0)
             else
                 love.graphics.setColor(1, 1, 1)
             end
             love.graphics.printf("NPC " .. i, 110, 120 + i * 20, 180, "left")
         end
 
-        -- === Inventory window ===
+        -- Inventory window
         local invX, invY = 320, 100
         love.graphics.setColor(0, 0, 0, 0.7)
         love.graphics.rectangle("fill", invX, invY, 200, 200)
@@ -120,67 +180,123 @@ function love.draw()
         end
     end
 
+    -- Station Menu (always stays up if open)
     if stationMenuOpen then
         love.graphics.setColor(0, 0, 0, 0.7)
-        love.graphics.rectangle("fill", 400, 100, 200, 200)
+        love.graphics.rectangle("fill", 540, 100, 200, 220)
         love.graphics.setColor(1, 1, 1)
-        love.graphics.printf("Assembly Station", 400, 110, 200, "center")
+        love.graphics.printf("Assembly Station", 540, 110, 200, "center")
 
         for i, slot in ipairs(slots) do
-            local y = 120 + i * 30
             if i == selectedSlotIndex then
-                love.graphics.setColor(1, 1, 0) -- highlight selected
+                love.graphics.setColor(1, 1, 0)
             else
                 love.graphics.setColor(1, 1, 1)
             end
-            local part = equippedParts[slot]
-            local text = slot:sub(1, 1):upper() .. slot:sub(2) .. ": "
-            if part then
-                text = text .. part.name
+            local part = equippedParts[slot.key]
+            local label
+            if slot.key == "BUILD" then
+                label = slot.label
             else
-                text = text .. "[Empty]"
+                label = slot.label .. ": " .. (part and part.name or "[empty]")
             end
-            love.graphics.printf(text, 410, y, 180, "left")
+            love.graphics.print(label, 550, 120 + i * 20)
         end
 
-        love.graphics.setColor(1, 1, 1)
-        love.graphics.printf("↑/↓ to move | E equip | Q unequip", 400, 280, 200, "center")
+        -- If slot selection menu is open, draw it alongside
+        if slotSelectionMenuOpen then
+            love.graphics.setColor(0, 0, 0, 0.9)
+            love.graphics.rectangle("fill", 760, 100, 200, 200)
+            love.graphics.setColor(1, 1, 1)
+            love.graphics.printf("Choose Part", 760, 110, 200, "center")
+
+            if #filteredParts == 0 then
+                love.graphics.printf("[no available parts]", 760, 140, 200, "center")
+            else
+                for i, part in ipairs(filteredParts) do
+                    if i == selectedFilteredIndex then
+                        love.graphics.setColor(1, 1, 0)
+                    else
+                        love.graphics.setColor(1, 1, 1)
+                    end
+                    love.graphics.print(part.name, 770, 130 + i * 20)
+                end
+            end
+        end
     end
 end
 
 function love.keypressed(key)
-    -- Pause always works
     if key == "p" then
         gamePaused = not gamePaused
         return
     end
 
-    -- === Station menu handling ===
+    -- Slot Selection Menu keys
+    if stationMenuOpen and slotSelectionMenuOpen then
+        if key == "up" then
+            selectedFilteredIndex = math.max(1, selectedFilteredIndex - 1)
+        elseif key == "down" then
+            selectedFilteredIndex = math.min(#filteredParts, selectedFilteredIndex + 1)
+        elseif key == "e" then
+            local chosen = filteredParts[selectedFilteredIndex]
+            if chosen then
+                for i, item in ipairs(player.inventory.items) do
+                    if item == chosen then
+                        table.remove(player.inventory.items, i)
+                        break
+                    end
+                end
+                local slot = slots[selectedSlotIndex]
+                equippedParts[slot.key] = chosen
+            end
+            slotSelectionMenuOpen = false
+        elseif key == "escape" or key == "q" then
+            slotSelectionMenuOpen = false
+        end
+        return
+    end
+
+    -- Station Menu keys
     if stationMenuOpen then
         if key == "up" then
             selectedSlotIndex = math.max(1, selectedSlotIndex - 1)
         elseif key == "down" then
             selectedSlotIndex = math.min(#slots, selectedSlotIndex + 1)
         elseif key == "e" then
-            -- Equip from inventory (first item for now)
-            if #player.inventory.items > 0 then
-                local part = table.remove(player.inventory.items, 1)
-                equippedParts[slots[selectedSlotIndex]] = part
+            local slot = slots[selectedSlotIndex]
+            if slot.key == "BUILD" then
+                if allSlotsFilled() then
+                    spawnBuiltMonster()
+                end
+            else
+                filteredParts = {}
+                for _, part in ipairs(player.inventory.items) do
+                    if part.slot == slot.key then
+                        table.insert(filteredParts, part)
+                    end
+                end
+                if #filteredParts > 0 then
+                    slotSelectionMenuOpen = true
+                    selectedFilteredIndex = 1
+                end
             end
         elseif key == "q" then
-            -- Unequip
-            local part = equippedParts[slots[selectedSlotIndex]]
-            if part then
-                table.insert(player.inventory.items, part)
-                equippedParts[slots[selectedSlotIndex]] = nil
+            local slot = slots[selectedSlotIndex]
+            if slot.key ~= "BUILD" then
+                local part = equippedParts[slot.key]
+                if part then
+                    table.insert(player.inventory.items, part)
+                    equippedParts[slot.key] = nil
+                end
             end
         elseif key == "escape" then
             stationMenuOpen = false
         end
-        return -- 🚪 stop here so player doesn't also move
+        return
     end
 
-    -- === NPC + inventory menu handling ===
+    -- NPC + inventory menu keys (unchanged)
     if menuOpen then
         if key == "left" then
             menuPane = "npcs"
@@ -211,10 +327,10 @@ function love.keypressed(key)
         elseif key == "escape" or key == "m" then
             menuOpen = false
         end
-        return -- 🚪 stop here so no movement happens
+        return
     end
 
-    -- === Normal gameplay input ===
+    -- Normal gameplay
     if key == "f" then
         markedNpc = player:markNearbyNpc()
     elseif key == "m" then
@@ -223,7 +339,6 @@ function love.keypressed(key)
         selectedMenuIndex = 1
         selectedInventoryIndex = 1
     elseif key == "e" then
-        -- check if near station
         local dx = player.x - assemblyStation.x
         local dy = player.y - assemblyStation.y
         if math.abs(dx) < 40 and math.abs(dy) < 40 then
