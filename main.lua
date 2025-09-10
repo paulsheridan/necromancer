@@ -41,6 +41,7 @@ function spawnBuiltMonster()
     table.insert(monsters, monster)
 
     -- ✅ Add monster to controllable pool (same as NPCs)
+    monster.isMonster = true
     insertMarkedNpc(monster)
 
     -- Clear equipped slots
@@ -120,12 +121,6 @@ function love.draw()
         monster:draw()
     end
 
-
-    -- draw assembly station
-    love.graphics.setColor(0.2, 0.8, 0.2)
-    love.graphics.rectangle("fill", assemblyStation.x, assemblyStation.y, assemblyStation.w, assemblyStation.h)
-    love.graphics.setColor(1, 1, 1)
-
     cam:detach()
 
     -- pause overlay
@@ -144,14 +139,21 @@ function love.draw()
         love.graphics.setColor(1, 1, 1)
         love.graphics.printf("NPCs", 100, 105, 200, "center")
 
-        for i, npc in ipairs(markedNpcs) do
+        for i, character in ipairs(markedNpcs) do
             if menuPane == "npcs" and i == selectedMenuIndex then
                 love.graphics.setColor(1, 1, 0)
             else
                 love.graphics.setColor(1, 1, 1)
             end
-            love.graphics.printf("NPC " .. i, 110, 120 + i * 20, 180, "left")
+
+            local label = "NPC " .. i
+            if character.isMonster then
+                label = "Monster " .. i
+            end
+
+            love.graphics.printf(label, 110, 120 + i * 20, 180, "left")
         end
+
 
         -- Inventory window
         local invX, invY = 320, 100

@@ -14,6 +14,11 @@ function drawCamera()
     if gameMap.layers["DoorWindowLayer"] then
         gameMap:drawLayer(gameMap.layers["DoorWindowLayer"])
     end
+    -- draw assembly station
+    love.graphics.setColor(0.2, 0.8, 0.2)
+    love.graphics.rectangle("fill", assemblyStation.x, assemblyStation.y, assemblyStation.w, assemblyStation.h)
+    love.graphics.setColor(1, 1, 1)
+
     player:draw()
     for _, npc in ipairs(npcs) do
         npc:draw()

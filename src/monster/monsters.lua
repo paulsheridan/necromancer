@@ -99,10 +99,3 @@ function monsters:update(dt)
         monster:update(dt)
     end
 end
-
--- function monsters:spawn()
---     for i = 1, numMonsters do
---         local monster = spawnMonster(math.random(250, 600), math.random(250, 600))
---         table.insert(monsters, monster)
---     end
--- end
