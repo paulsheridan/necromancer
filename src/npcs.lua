@@ -10,7 +10,7 @@ function spawnNpc(x, y)
     npc.height = 16
     npc.dirX = 0
     npc.dirY = 0
-    npc.prevDir = "down" -- last facing direction
+    npc.prevDir = "down"
     npc.moveTimer = 0
     npc.moveInterval = 2
     npc.color = { 0, 0, 1 }
@@ -30,23 +30,20 @@ function spawnNpc(x, y)
     npc.animations.down      = anim8.newAnimation(npc.grid(25, 7, 25, 8, 25, 7, 25, 9), npc.animSpeed)
     npc.animations.right     = anim8.newAnimation(npc.grid(24, 7, 24, 8, 24, 7, 24, 9), npc.animSpeed)
     npc.animations.up        = anim8.newAnimation(npc.grid(26, 7, 26, 8, 26, 7, 26, 9), npc.animSpeed)
+    -- ✅ make a new copy for left so it’s distinct
     npc.animations.left      = anim8.newAnimation(npc.grid(24, 7, 24, 8, 24, 7, 24, 9), npc.animSpeed)
 
     npc.animations.idleDown  = anim8.newAnimation(npc.grid(25, 7), 0.22)
     npc.animations.idleUp    = anim8.newAnimation(npc.grid(26, 7), 0.22)
-    npc.animations.idleLeft  = anim8.newAnimation(npc.grid(27, 7), 0.22)
     npc.animations.idleRight = anim8.newAnimation(npc.grid(27, 7), 0.22)
+    -- ✅ also make a new copy for idleLeft
+    npc.animations.idleLeft  = anim8.newAnimation(npc.grid(27, 7), 0.22)
 
+    npc.anim                 = npc.animations.idleDown
 
-    npc.anim = npc.animations.idleDown
+    function npc:mark() self.marked = true end
 
-    function npc:mark()
-        self.marked = true
-    end
-
-    function npc:isMarked()
-        return self.marked
-    end
+    function npc:isMarked() return self.marked end
 
     function npc:update(dt)
         self.x = self:getX()
@@ -58,7 +55,7 @@ function spawnNpc(x, y)
             self.moveTimer = self.moveTimer + dt
             if self.moveTimer >= self.moveInterval then
                 self.moveTimer = 0
-                local directions = { "up", "down", "left", "right", "stop" }
+                local directions = { "up", "down", "left", "right", "stop", "stop", "stop", "stop", "stop" }
                 self.direction = directions[math.random(#directions)]
             end
 
@@ -76,15 +73,38 @@ function spawnNpc(x, y)
 
             self:setLinearVelocity(vx, vy)
 
-            -- Update prevDir based on actual velocity
-            local eps = 1 -- threshold to ignore tiny jitter
+            local eps = 1
             if math.abs(vx) > eps or math.abs(vy) > eps then
                 if math.abs(vx) > math.abs(vy) then
                     self.prevDir = (vx > 0) and "right" or "left"
                 else
                     self.prevDir = (vy > 0) and "down" or "up"
                 end
+
+                if self.prevDir == "up" then
+                    self.anim = self.animations.up
+                elseif self.prevDir == "down" then
+                    self.anim = self.animations.down
+                elseif self.prevDir == "left" then
+                    self.anim = self.animations.left
+                elseif self.prevDir == "right" then
+                    self.anim = self.animations.right
+                end
+            else
+                if self.prevDir == "up" then
+                    self.anim = self.animations.idleUp
+                elseif self.prevDir == "down" then
+                    self.anim = self.animations.idleDown
+                elseif self.prevDir == "left" then
+                    self.anim = self.animations.idleLeft
+                elseif self.prevDir == "right" then
+                    self.anim = self.animations.idleRight
+                end
             end
+        end
+
+        if self.anim then
+            self.anim:update(dt)
         end
     end
 
@@ -100,17 +120,15 @@ function spawnNpc(x, y)
         else
             self.anim = self.animations.idleDown
         end
-
         self.anim:gotoFrame(1)
         self:setLinearVelocity(0, 0)
     end
 
     function npc:draw()
         local scaleX = 1
-        if self.anim == self.animations.left or self.anim == self.animations.idleLeft then
+        if self.anim == self.animations.right or self.anim == self.animations.idleRight then
             scaleX = -1
         end
-
         self.anim:draw(self.spriteSheet, self.x, self.y - 2, nil, scaleX, 1, 9.5, 10.5)
     end
 
